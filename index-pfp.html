@@ -10,6 +10,10 @@
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+
+    <script src="//imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
+    <!-- <script src="https://imasdk.googleapis.com/js/sdkloader/ima3_debug.js"></script> -->
+    <script src="https://www.youtube.com/iframe_api?ima=1"></script>
 </head>
 
 <body>
@@ -18,23 +22,19 @@
 
         <div class="row">
             <div class="col my-3">
-                <div id="pfp-container">
-                    <div class="ratio ratio-16x9">
-                        <iframe width="560" height="315"
+                <div class="ratio ratio-16x9">
+                    <div id="pfp-container">
+                        <!-- <iframe width="560" height="315"
                             src="https://www.youtube.com/embed/HK-gAZN74o0?si=gi3Xkj2qCEx-OhEI"
                             title="YouTube video player" frameborder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                            allowfullscreen></iframe>
+                            allowfullscreen></iframe> -->
                     </div>
                 </div>
             </div>
         </div>
 
     </div>
-
-    <!-- <script src="//imasdk.googleapis.com/js/sdkloader/ima3.js"></script> -->
-    <script src="https://imasdk.googleapis.com/js/sdkloader/ima3_debug.js"></script>
-    <script src="https://www.youtube.com/iframe_api?ima=1"></script>
 
     <script>
         var adsTagUrl = 'https://pubads.g.doubleclick.net/gampad/ads?' + 'iu=/21775744923/external/single_ad_samples&sz=640x480&' + 'cust_params=sample_ct%3Dlinear&ciu_szs=300x250%2C728x90&gdfp_req=1&' + 'output=vast&unviewed_position_start=1&env=vp&impl=s&correlator=';
@@ -59,35 +59,142 @@
     </script>
 
     <script>
-        let player;
-        let imaManager;
-        //Youcanuseacallbackfunctionifyouwanttodosome
-        //customizationaftertheplayerisinstantiatedoryou
-        //wanthandlestotheplayerandIMAmanager. 
+        // set video values
+        var video = {
+            h: '390',
+            w: '640',
+            videoId: 'HK-gAZN74o0'
+        }
+        var player;
+        var imaManager;
+        var tag = document.createElement('script');
+        tag.src = 'https://www.youtube.com/iframe_api';
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        function onYouTubeIframeAPIReady() {
+            /* YT.createPlayerForPublishers(
+                'pfp-container',
+                makeAdsRequest, {
+                youtubeOptions: {
+                    videoId: 'HK-gAZN74o0',
+                    height: "360px",
+                    // If you want the player and ad to responsively resize
+                    // when the page changes size, set the width to a
+                    // percentage. Otherwise, set it to a pixel value. 
+                    width: "100%",
+                }
+            },
+            onPlayerReady); */
+
+            player = new YT.Player('pfp-container', {
+                height: video.h,
+                width: video.w,
+                videoId: video.videoId,
+                playerVars: {
+                    enablejsapi: true,
+                    autoplay: 1,
+                },
+                events: {
+                    'onReady': onPlayerReady,
+                    // 'onStateChange': onPlayerStateChange
+                    //'onError': onPlayerError
+                }
+            });
+        }
+
+        /* function onPlayerReady(event) {
+            setInterval(onPlayProgress, 1000);
+        } */
         function onPlayerReady(plyr, ima) {
             player = plyr;
             imaManager = ima;
         }
+
+        /* function onPlayerStateChange(event) {
+            switch (event.data) {
+                case YT.PlayerState.PLAYING:
+                    if (cleanTime() == 0) {
+                        console.log(
+                            "{'event': 'youtubeChange','eventCategory': 'video','eventAction': 'started', 'eventLabel': 'Video Id: '" + video.videoId + "}");
+                    } else {
+                        console.log(
+                            "{'event': 'youtubeChange','eventCategory': 'video','eventAction': 'played','eventLabel': 'Video Id: ' " +
+                            video.videoId + "' | t: '" + cleanTime() + "}");
+                        console.log('currentTime:', player.getCurrentTime(), 'duration:', player.getDuration());
+                    };
+                    break;
+                case YT.PlayerState.PAUSED:
+                    if (player.getDuration() - player.getCurrentTime() != 0) {
+                        console.log(
+                            "{'event': 'youtubeChange','eventCategory': 'video','eventAction': 'paused','eventLabel': 'Video Id: ' " +
+                            video.videoId + "' | t: ' " + cleanTime() + "}");
+                    };
+                    break;
+                case YT.PlayerState.ENDED:
+                    console.log("{'event': 'youtubeChange','eventCategory': 'video','eventAction': 'ended','eventLabel':" +
+                        video.videoId + "}");
+                    break;
+                case YT.PlayerState.BUFFERING:
+                    console.log(
+                        "{'event': 'youtubeChange','eventCategory': 'video','eventAction': 'Buffering','eventLabel':" +
+                        video.videoId + "}");
+                    break;
+                case YT.PlayerState.CUED:
+                    console.log("{'event': 'youtubeChange','eventCategory': 'video','eventAction': 'CUED','eventLabel':" +
+                        video.videoId + "}");
+                    break;
+            };
+        }; */
+
+        /* function cleanTime() {
+            return Math.round(player.getCurrentTime())
+        }; */
+
+        /* var hasFired0Percent = false;
+        var hasFired25Percent = false;
+        var hasFired50Percent = false;
+        var hasFired75Percent = false;
+        var hasFired100Percent = false;
+
+        function onPlayProgress() {
+            viewedPercentage = player.getCurrentTime() / player.getDuration();
+            if (viewedPercentage >= 0.99 && !hasFired100Percent) {
+                console.log("Video completed (100%): " + viewedPercentage);
+                hasFired100Percent = true;
+            } else if (viewedPercentage >= 0.75 && !hasFired75Percent) {
+                console.log("75% of the video: " + viewedPercentage);
+                hasFired75Percent = true;
+            } else if (viewedPercentage >= 0.5 && !hasFired50Percent) {
+                console.log("50% of the video: " + viewedPercentage);
+                hasFired50Percent = true;
+            } else if (viewedPercentage >= 0.25 && !hasFired25Percent) {
+                console.log("25% of the video: " + viewedPercentage);
+                hasFired25Percent = true;
+            } else if (viewedPercentage >= 0.01 && !hasFired0Percent) {
+                console.log("0.01% of the video: " + viewedPercentage);
+                hasFired0Percent = true;
+            }
+        } */
     </script>
 
-    <script>
+    <!-- <script>
         function onYouTubeIframeAPIReady() {
             YT.createPlayerForPublishers(
                 'pfp-container',
                 makeAdsRequest, {
                 youtubeOptions: {
-                    videoId: 'YtbI6C1iKmY',
+                    videoId: 'HK-gAZN74o0',
                     height: "360px",
-                    //Ifyouwanttheplayerandadtoresponsivelyresize
-                    //whenthepagechangessize,setthewidthtoa
-                    //percentage.Otherwise,setittoapixelvalue. 
+                    // If you want the player and ad to responsively resize
+                    // when the page changes size, set the width to a
+                    // percentage. Otherwise, set it to a pixel value. 
                     width: "100%",
                 }
             },
-                onPlayerReady
-            );
+                onPlayerReady);
         }
-    </script>
+    </script> -->
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
         integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3"
